@@ -5,9 +5,12 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
+import com.muktitama.modulretrofit.Adapters.ClickListener;
 import com.muktitama.modulretrofit.Adapters.MoviesAdapter;
+import com.muktitama.modulretrofit.Adapters.RecyclerTouchListener;
 import com.muktitama.modulretrofit.Models.Movie;
 import com.muktitama.modulretrofit.Models.MovieResponse;
 import com.muktitama.modulretrofit.Rest.ApiClient;
@@ -24,6 +27,12 @@ public class MainActivity extends AppCompatActivity {
 
     private final static String API_KEY = "e371e8b60f5c78d50b63987a13597ccc";
 
+    RecyclerView recyclerView;
+
+    List<Movie> movies;
+
+   String judul,subtitle,rating,deskripsi;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,25 +43,44 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.movies_recycler_view);
+//        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.movies_recycler_view);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView =  findViewById(R.id.movies_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        Manggil();
 
-        ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, recyclerView, new ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                Toast.makeText(MainActivity.this, " Rating : "+position, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+                Toast.makeText(MainActivity.this, " Rating : "+position, Toast.LENGTH_LONG).show();
+            }
+        }));
+    }
+
+    private void Manggil(){
+    ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
 
         Call<MovieResponse> call = apiService.getTopRatedMovies(API_KEY);
         call.enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
                 int statusCode = response.code();
-                List<Movie> movies = response.body().getResults();
-                recyclerView.setAdapter(new MoviesAdapter(movies,
-                        R.layout.list_item_movie, getApplicationContext()));
+
+                //List<Movie> movies = response.body().getResults();
+                movies = response.body().getResults();
+                recyclerView.setAdapter(new MoviesAdapter(movies, R.layout.list_item_movie, getApplicationContext()));
             }
 
             @Override
             public void onFailure(Call<MovieResponse> call, Throwable t) {
                 Log.e(TAG, t.toString());
             }
+
 
         }); }
 }

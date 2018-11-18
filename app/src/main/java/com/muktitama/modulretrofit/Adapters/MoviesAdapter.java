@@ -1,6 +1,7 @@
 package com.muktitama.modulretrofit.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.muktitama.modulretrofit.Main2Activity;
 import com.muktitama.modulretrofit.Models.Movie;
 import com.muktitama.modulretrofit.R;
 
@@ -65,6 +67,17 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         holder.data.setText(movies.get(position).getReleaseDate());
         holder.movieDescription.setText(movies.get(position).getOverview());
         holder.rating.setText(movies.get(position).getVoteAverage().toString());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(view.getContext(),Main2Activity.class);
+                i.putExtra("judul",movies.get(position).getTitle());
+                i.putExtra("tanggal",movies.get(position).getReleaseDate());
+                i.putExtra("deskripsi",movies.get(position).getOverview());
+                i.putExtra("rating",movies.get(position).getVoteAverage().toString());
+                view.getContext().startActivity(i);
+            }
+        });
     }
 
     @Override
